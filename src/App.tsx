@@ -1,8 +1,8 @@
 import React from "react";
-import Game from "./components/Game";
+import Main from "./pages/Main";
 
 const App: React.VFC = () => {
-  return <Game />;
+  return <Main />;
 };
 
 export default App;
