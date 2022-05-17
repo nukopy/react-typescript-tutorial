@@ -1,15 +1,8 @@
-import React from "react";
+import { SquareProps } from "../types/SquareTypes";
 
-interface Props {
-  value: number;
-}
-
-const Square: React.VFC<Props> = ({ value }) => {
+const Square = ({ value, onClick }: SquareProps): JSX.Element => {
   return (
-    <button
-      className="square"
-      onClick={() => console.log(`Square ${value} clicked!`)}
-    >
+    <button className="square" onClick={onClick}>
       {value}
     </button>
   );

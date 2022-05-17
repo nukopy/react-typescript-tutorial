@@ -1,11 +1,11 @@
-import React from "react";
+import { BoardProps } from "../types/BoardTypes";
 import Square from "./Square";
 
-const renderSquare = (value: number) => {
-  return <Square value={value} />;
-};
+const Board = ({ squares, onClick }: BoardProps) => {
+  const renderSquare = (i: number) => {
+    return <Square value={squares[i]} onClick={() => onClick(i)} />;
+  };
 
-const Board: React.VFC = () => {
   const status = "Next player: X";
 
   return (
