@@ -1,8 +1,8 @@
 import React from "react";
 import Square from "./Square";
 
-const renderSquare = (i: number) => {
-  return <Square />;
+const renderSquare = (value: number) => {
+  return <Square value={value} />;
 };
 
 const Board: React.VFC = () => {
