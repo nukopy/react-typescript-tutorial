@@ -1,7 +1,5 @@
-import React from "react";
-import { Repeat } from "typescript-tuple";
-import { squareStates } from "../types/SquareTypes";
 import { BoardState } from "../types/BoardTypes";
+import { squareStates } from "../types/SquareTypes";
 import Board from "./Board";
 
 // Board の初期状態
@@ -17,7 +15,7 @@ const initialBoardState: BoardState = [
   squareStates.null,
 ];
 
-const Game: React.VFC = () => {
+const Game = (): JSX.Element => {
   return (
     <div className="game">
       <div className="game-board">

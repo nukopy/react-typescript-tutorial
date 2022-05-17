@@ -1,7 +1,7 @@
 import { BoardProps } from "../types/BoardTypes";
 import Square from "./Square";
 
-const Board = ({ squares, onClick }: BoardProps) => {
+const Board = ({ squares, onClick }: BoardProps): JSX.Element => {
   const renderSquare = (i: number) => {
     return <Square value={squares[i]} onClick={() => onClick(i)} />;
   };

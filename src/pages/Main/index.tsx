@@ -1,7 +1,7 @@
 import React from "react";
 import Game from "../../components/Game";
 
-const Main: React.VFC = () => {
+const Main = (): JSX.Element => {
   return <Game />;
 };
 
