@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { squareStates } from "../types/SquareTypes";
 import { BoardState, stepLimit } from "../types/BoardTypes";
-import { Step, GameState } from "../types/GameTypes";
+import { Step, ViewedStep, GameState } from "../types/GameTypes";
 import Board from "./Board";
 
 // Board の初期状態
@@ -17,11 +17,6 @@ const initialBoardState: BoardState = [
   squareStates.null,
   squareStates.null,
 ];
-
-type ViewedStep = {
-  squares: BoardState;
-  stepNumber: number;
-};
 
 // Game の初期状態
 const Game = (): JSX.Element => {
@@ -86,7 +81,7 @@ const Game = (): JSX.Element => {
     });
   };
 
-  const moveHistory = (stepNumber: number) => {
+  const jumpTo = (stepNumber: number) => {
     // 指定した履歴の盤面へ移動する。ただし、履歴は削除しない。
     setViewedStep({
       squares: gameState.history[stepNumber].squares,
@@ -95,7 +90,7 @@ const Game = (): JSX.Element => {
   };
 
   const onClickHistory = (stepNumber: number) => {
-    moveHistory(stepNumber);
+    jumpTo(stepNumber);
   };
 
   const restartGame = () => {
