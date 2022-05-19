@@ -19,7 +19,7 @@ const initialBoardState: BoardState = [
 ];
 
 const Game = (): JSX.Element => {
-  // ゲーム持つステートと見せる用のステートを分けて管理する
+  // ゲームの状態
   const [gameState, setGameState] = useState<GameState>({
     history: [
       {
