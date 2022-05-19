@@ -1,8 +1,12 @@
-import React from "react";
 import Game from "../../components/Game";
 
 const Main = (): JSX.Element => {
-  return <Game />;
+  return (
+    <div>
+      <h1>Tic-Tac-Toe</h1>
+      <Game />
+    </div>
+  );
 };
 
 export default Main;

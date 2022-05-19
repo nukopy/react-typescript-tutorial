@@ -7,6 +7,13 @@ import { BoardState } from "../types/BoardTypes";
 */
 
 // 盤面の現在の状態
-type Step = {
+export type Step = {
   squares: BoardState;
+  isXStep: boolean;
+};
+
+// ゲームの状態
+export type GameState = {
+  readonly history: Step[];
+  readonly stepNumber: number; // 現在何番目の手番かを表す
 };

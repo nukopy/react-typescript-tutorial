@@ -1,16 +1,13 @@
 import { BoardProps } from "../types/BoardTypes";
 import Square from "./Square";
 
-const Board = ({ squares, onClick }: BoardProps): JSX.Element => {
+const Board = ({ squares, onClickSquare }: BoardProps): JSX.Element => {
   const renderSquare = (i: number) => {
-    return <Square value={squares[i]} onClick={() => onClick(i)} />;
+    return <Square mark={squares[i]} onClickSquare={() => onClickSquare(i)} />;
   };
-
-  const status = "Next player: X";
 
   return (
     <div>
-      <div className="status">{status}</div>
       <div className="board-row">
         {renderSquare(0)}
         {renderSquare(1)}
