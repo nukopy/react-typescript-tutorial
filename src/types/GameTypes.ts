@@ -15,11 +15,6 @@ export type Step = {
 // ゲームの状態
 export type GameState = {
   readonly history: Step[];
-  readonly stepNumber: number; // 現在何番目の手番かを表す
-};
-
-// 現在表示している盤面
-export type ViewedStep = {
-  squares: BoardState;
-  stepNumber: number;
+  readonly stepNumber: number; // 現在のゲームが何回手番が進んでいるかを表す番号
+  readonly viewedStepNumber: number; // 現在画面に表示している手番の番号
 };

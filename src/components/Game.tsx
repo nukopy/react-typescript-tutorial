@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { squareStates } from "../types/SquareTypes";
 import { BoardState, stepLimit } from "../types/BoardTypes";
-import { Step, ViewedStep, GameState } from "../types/GameTypes";
+import { Step, GameState } from "../types/GameTypes";
 import Board from "./Board";
 
 // Board の初期状態
@@ -29,10 +29,7 @@ const Game = (): JSX.Element => {
       },
     ],
     stepNumber: 0,
-  });
-  const [viewedStep, setViewedStep] = useState<ViewedStep>({
-    squares: gameState.history[0].squares,
-    stepNumber: 0,
+    viewedStepNumber: 0,
   });
 
   const onClickSquare = (squareNumber: number) => {
@@ -40,52 +37,57 @@ const Game = (): JSX.Element => {
       square がクリックされたときに手番を進めるための関数。クリックされた番号が渡される。
     */
 
-    // 現在の状態
-    const prevHistory = gameState.history;
-    const prevStepNumber = gameState.stepNumber;
-    const prevStep = prevHistory[prevStepNumber];
-    const prevSquares = prevStep.squares;
-    const prevIsXStep = prevStep.isXStep;
-
-    // 次のステップへ進んでよいかチェック
-    if (prevStepNumber !== viewedStep.stepNumber) {
-      // 過去の盤面を見ている状態では盤面をクリックしても進めない（）
+    // 次の手番へ進んでよいかチェック
+    // check: 現在の手番と表示している手番が異なる場合（つまり手番を履歴から振り返っているとき）、手番を進める（盤面をクリックする）ことができない
+    if (gameState.stepNumber !== gameState.viewedStepNumber) {
       alert("現在の盤面へ移動してください");
       return;
     }
-    if (prevStepNumber === stepLimit - 1) return;
-    if (prevSquares[squareNumber] !== squareStates.null) return; // 既に盤面が埋まっているところにはマークを置けない
 
-    // 次のステップの状態
-    const drawnMark = prevIsXStep ? squareStates.X : squareStates.O; // 現在のステップで描画されるマーク
-    const nextSquares = Object.assign([], prevSquares) as BoardState;
-    nextSquares[squareNumber] = drawnMark;
-    const nextIsXStep = !prevIsXStep; // 手番が逆になる
-    const nextStep: Step = {
-      squares: nextSquares,
-      isXStep: nextIsXStep,
-    };
-    prevHistory.push(nextStep);
-    const nextHistory = prevHistory;
-    const nextStepNumber = prevStepNumber + 1;
-    const nextGameState = {
-      history: nextHistory,
-      stepNumber: nextStepNumber,
-    };
+    // check: 手番が上限まで進んでいたら、手番を進めることができない
+    if (gameState.stepNumber === stepLimit - 1) return;
+
+    // check: 既に盤面が埋まっているマスにはマークを置けない
+    if (
+      gameState.history[gameState.stepNumber].squares[squareNumber] !==
+      squareStates.null
+    )
+      return;
 
     // ステートの更新する
-    setGameState(nextGameState);
-    setViewedStep({
-      squares: nextSquares,
-      stepNumber: nextStepNumber,
+    setGameState((prev) => {
+      // 新しい盤面を定義
+      const drawnMark = prev.history[prev.stepNumber].isXStep
+        ? squareStates.X
+        : squareStates.O;
+      const nextIsXStep = !prev.history[prev.stepNumber].isXStep; // 手番が逆になる
+      const nextSquares = Object.assign(
+        [],
+        prev.history[prev.stepNumber].squares
+      ) as BoardState;
+      nextSquares[squareNumber] = drawnMark;
+
+      const nextStep: Step = {
+        squares: nextSquares,
+        isXStep: nextIsXStep,
+      };
+
+      // 更新
+      return {
+        history: [...prev.history, nextStep],
+        stepNumber: prev.stepNumber + 1,
+        viewedStepNumber: prev.viewedStepNumber + 1,
+      };
     });
   };
 
   const jumpTo = (stepNumber: number) => {
     // 指定した履歴の盤面へ移動する。ただし、履歴は削除しない。
-    setViewedStep({
-      squares: gameState.history[stepNumber].squares,
-      stepNumber: stepNumber,
+    setGameState((prev) => {
+      return {
+        ...prev,
+        viewedStepNumber: stepNumber,
+      };
     });
   };
 
@@ -94,7 +96,8 @@ const Game = (): JSX.Element => {
   };
 
   const restartGame = () => {
-    const init: GameState = {
+    // ステートの初期化
+    setGameState({
       history: [
         {
           squares: initialBoardState,
@@ -102,12 +105,7 @@ const Game = (): JSX.Element => {
         },
       ],
       stepNumber: 0,
-    };
-
-    setGameState(init);
-    setViewedStep({
-      squares: initialBoardState,
-      stepNumber: 0,
+      viewedStepNumber: 0,
     });
   };
 
@@ -121,7 +119,7 @@ const Game = (): JSX.Element => {
       {/* ゲームボード */}
       <div className="game-board">
         <h2>Game Board</h2>
-        {gameState.stepNumber !== viewedStep.stepNumber && (
+        {gameState.stepNumber !== gameState.viewedStepNumber && (
           <div>
             <h3 style={{ color: "rgb(200, 55, 55)" }}>Reviewing...</h3>
             <h3 style={{ color: "rgb(200, 55, 55)" }}>
@@ -129,7 +127,10 @@ const Game = (): JSX.Element => {
             </h3>
           </div>
         )}
-        <Board squares={viewedStep.squares} onClickSquare={onClickSquare} />
+        <Board
+          squares={gameState.history[gameState.viewedStepNumber].squares}
+          onClickSquare={onClickSquare}
+        />
       </div>
 
       {/* ゲームの手番、履歴などの情報 */}
