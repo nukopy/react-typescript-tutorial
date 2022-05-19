@@ -18,7 +18,6 @@ const initialBoardState: BoardState = [
   squareStates.null,
 ];
 
-// Game の初期状態
 const Game = (): JSX.Element => {
   // ゲーム持つステートと見せる用のステートを分けて管理する
   const [gameState, setGameState] = useState<GameState>({
@@ -32,12 +31,17 @@ const Game = (): JSX.Element => {
     viewedStepNumber: 0,
   });
 
-  const onClickSquare = (squareNumber: number) => {
-    /*
-      square がクリックされたときに手番を進めるための関数。クリックされた番号が渡される。
+  /*
+    状態の更新に関する関数群
     */
 
-    // 次の手番へ進んでよいかチェック
+  /**
+   * 特定のマスにマークしたい、手番を進めるための関数
+   * @param squareNumber マークしたいマスの番号
+   * @returns
+   */
+  const markSquare = (squareNumber: number) => {
+    // 次の手番へ進んでよいかのチェック
     // check: 現在の手番と表示している手番が異なる場合（つまり手番を履歴から振り返っているとき）、手番を進める（盤面をクリックする）ことができない
     if (gameState.stepNumber !== gameState.viewedStepNumber) {
       alert("現在の盤面へ移動してください");
@@ -81,8 +85,11 @@ const Game = (): JSX.Element => {
     });
   };
 
+  /**
+   * 手番履歴の内、指定した手番の盤面へ移動する
+   * @param stepNumber
+   */
   const jumpTo = (stepNumber: number) => {
-    // 指定した履歴の盤面へ移動する。ただし、履歴は削除しない。
     setGameState((prev) => {
       return {
         ...prev,
@@ -91,12 +98,10 @@ const Game = (): JSX.Element => {
     });
   };
 
-  const onClickHistory = (stepNumber: number) => {
-    jumpTo(stepNumber);
-  };
-
+  /**
+   * ゲームをリセットする
+   */
   const restartGame = () => {
-    // ステートの初期化
     setGameState({
       history: [
         {
@@ -109,11 +114,29 @@ const Game = (): JSX.Element => {
     });
   };
 
+  /**
+   * マスをクリックしたときに動作する関数。マスを塗りつぶし、ゲームを進行する。
+   * @param squareNumber クリックしたマスの番号
+   */
+  const onClickSquare = (squareNumber: number) => {
+    markSquare(squareNumber);
+  };
+
+  /**
+   * 画面右側の手番履歴をクリックしたときに動作する関数。特定の手番を表示する。
+   * @param stepNumber
+   */
+  const onClickHistory = (stepNumber: number) => {
+    jumpTo(stepNumber);
+  };
+
+  /**
+   * ゲームのリセットボタンが押されたときに動作する関数
+   */
   const onClickResetButton = () => {
     restartGame();
   };
 
-  // Board に渡す状態
   return (
     <div className="game">
       {/* ゲームボード */}
