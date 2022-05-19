@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { squareStates } from "../types/SquareTypes";
+import { SquareState, squareStates } from "../types/SquareTypes";
 import { BoardState, stepLimit } from "../types/BoardTypes";
 import { Step, GameState } from "../types/GameTypes";
 import Board from "./Board";
@@ -18,6 +18,30 @@ const initialBoardState: BoardState = [
   squareStates.null,
 ];
 
+// Game の勝敗を決める
+// note: これドメインルールだと思うんだけど、普通はサーバーサイドに持つもの？
+const calculateGameWinner = (bs: BoardState): SquareState => {
+  const winPattern = [
+    [0, 1, 2],
+    [0, 3, 6],
+    [0, 4, 8],
+    [1, 4, 7],
+    [2, 4, 6],
+    [2, 5, 8],
+    [3, 4, 5],
+    [6, 7, 8],
+  ];
+
+  for (let i = 0; i < winPattern.length; i++) {
+    const [a, b, c] = winPattern[i];
+
+    if (bs[a] && bs[a] === bs[b] && bs[b] === bs[c])
+      return bs[a] as SquareState; // 勝者のマークを返す
+  }
+
+  return null as SquareState;
+};
+
 const Game = (): JSX.Element => {
   // ゲームの状態
   const [gameState, setGameState] = useState<GameState>({
@@ -30,6 +54,8 @@ const Game = (): JSX.Element => {
     stepNumber: 0,
     viewedStepNumber: 0,
   });
+
+  const history = gameState.history;
 
   /*
     状態の更新に関する関数群
@@ -53,8 +79,7 @@ const Game = (): JSX.Element => {
 
     // check: 既に盤面が埋まっているマスにはマークを置けない
     if (
-      gameState.history[gameState.stepNumber].squares[squareNumber] !==
-      squareStates.null
+      history[gameState.stepNumber].squares[squareNumber] !== squareStates.null
     )
       return;
 
@@ -137,6 +162,9 @@ const Game = (): JSX.Element => {
     restartGame();
   };
 
+  const winner = calculateGameWinner(history[gameState.stepNumber].squares);
+  // if (winner) alert(`おめでとうございます！\n${winner} の勝ちです🎉`);
+
   return (
     <div className="game">
       {/* ゲームボード */}
@@ -151,7 +179,7 @@ const Game = (): JSX.Element => {
           </div>
         )}
         <Board
-          squares={gameState.history[gameState.viewedStepNumber].squares}
+          squares={history[gameState.viewedStepNumber].squares}
           onClickSquare={onClickSquare}
         />
       </div>
@@ -160,16 +188,22 @@ const Game = (): JSX.Element => {
       <div className="game-info">
         <h2>Game Info</h2>
         <div className="status">
-          Next Player:{" "}
-          {gameState.history[gameState.stepNumber].isXStep
-            ? squareStates.X
-            : squareStates.O}
+          {winner ? (
+            <>🎉 Winner: {winner} 🎉</>
+          ) : (
+            <>
+              Next Player:{" "}
+              {history[gameState.stepNumber].isXStep
+                ? squareStates.X
+                : squareStates.O}
+            </>
+          )}
         </div>
         <div>
           <button onClick={onClickResetButton}>Reset Game</button>
         </div>
         <ol>
-          {gameState.history.map((h, stepNumber) => {
+          {history.map((h, stepNumber) => {
             const historyStr =
               stepNumber === 0 ? `Go to start` : `Go to move ${stepNumber}`;
 
